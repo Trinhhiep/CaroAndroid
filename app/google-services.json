@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "380463326258",
+    "firebase_url": "https://fir-carogame-default-rtdb.firebaseio.com",
+    "project_id": "fir-carogame",
+    "storage_bucket": "fir-carogame.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:380463326258:android:f012d735c020a1b204482b",
+        "android_client_info": {
+          "package_name": "com.example.caroonline"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "380463326258-97fd3j8fif8f4svj4gp8fp850bclfqg4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDdFeoGdnyACbE20tPuEDiKoDYHK_H46PI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "380463326258-97fd3j8fif8f4svj4gp8fp850bclfqg4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:380463326258:android:daea1049b2b90b9d04482b",
+        "android_client_info": {
+          "package_name": "com.example.gamecaroonline"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "380463326258-97fd3j8fif8f4svj4gp8fp850bclfqg4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDdFeoGdnyACbE20tPuEDiKoDYHK_H46PI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "380463326258-97fd3j8fif8f4svj4gp8fp850bclfqg4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
