@@ -1,19 +1,9 @@
 package com.example.caroonline;
 
-import android.util.Log;
-
-import androidx.annotation.NonNull;
-
 import com.example.caroonline.models.Room;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
+import com.example.caroonline.models.User;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
-import java.security.PublicKey;
-
-import static android.content.ContentValues.TAG;
 
 public class FirebaseSingleton {
     public DatabaseReference databaseReference;
@@ -23,13 +13,16 @@ public class FirebaseSingleton {
         databaseReference = FirebaseDatabase.getInstance().getReference();
     }
 
-    public void insert(Room room) {
+    public void insert(Room room) {// bef
         databaseReference.child("room").child(room.getId()).setValue(room);
     }
-
+public  void updateListPlayer(String username,Room room){
+        databaseReference.child("room").child(room.getId()).child("playerIdList").setValue(username);
+}
     public void insert(User user) {
         databaseReference.child("user").child(user.getUsername()).setValue(user);
     }
+
 
 
     //tạo 1 instance duy nhất (static) thông qua nested class lớp lồng lớp

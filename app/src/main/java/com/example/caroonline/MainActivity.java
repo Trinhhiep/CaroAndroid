@@ -12,13 +12,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.caroonline.models.User;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
 
 public class MainActivity extends AppCompatActivity {
-
+    public static String usernameStatic ;
     private EditText et_username;
     private EditText et_password;
     private Button btn_login;
@@ -33,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
         String[] userStr = {};
         if (intent.getStringArrayExtra("user") != null) {
             userStr = intent.getStringArrayExtra("user");
+
+            btn_login.setEnabled(true);
         }
 
 
@@ -61,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        if(userStr.length != 0 ){
+        if (userStr.length != 0) {
             et_username.setText(userStr[0]);
             et_password.setText(userStr[1]);
         }
@@ -89,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent); // r thi start thoi.oki
     }
 
-    private void startMenuRoomActivity(String username) { // password nen giu kin ti mi
+    private void startMenuRoomActivity(String username) {
         Intent intent = new Intent(MainActivity.this, MenuRoomActivity.class);
         intent.putExtra("username", username);
         startActivity(intent);
@@ -99,8 +102,8 @@ public class MainActivity extends AppCompatActivity {
         FirebaseSingleton.getInstance().databaseReference.child("user").child(userName).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) { // cai nay ban lam sau nha// lam ,g thoing bao password sai
-                User user = snapshot.getValue(User.class);
-                if (user != null) {
+                User user = snapshot.getValue(User.class);// m bấm làm gì  // lam tiep di mi. chuyen qua lay string.sao phải chuyển , luc trước van chay bt ma, thi gio no v a. lấy
+                if (user != null ) {
                     if (user.getPassword().compareTo(password) == 0) {
                         login(userName);
                     } else {
@@ -119,6 +122,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void login(String username) { // Hip. tao 1 activty khac cho sign up di. fragment cu tu tu. ok , ma cái chuyển acti
+usernameStatic = username;
         startMenuRoomActivity(username);
     }
 

@@ -1,30 +1,26 @@
 package com.example.caroonline;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.caroonline.models.Room;
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DatabaseReference;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.zip.Inflater;
 
 public class MenuRoomActivity extends AppCompatActivity {
     RecyclerView recyclerView;
+    FloatingActionButton flab;
+    String playerName = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +29,8 @@ public class MenuRoomActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         if (intent.getStringExtra("username") != null) {
-            String title = String.format("Hello %s", intent.getStringExtra("username"));
+            playerName = intent.getStringExtra("username");
+            String title = String.format("Hello %s", playerName);
             setTitle(title); // ban coi lai cai item_room sau nha.oki  design coi sau het cug dc
         }
 
@@ -41,37 +38,56 @@ public class MenuRoomActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         recyclerView = findViewById(R.id.rv_room); // ok ve may cai setup chua ban//Utility là gi do
+        flab = findViewById(R.id.flab);
 
         DatabaseReference myRef = FirebaseSingleton.getInstance().databaseReference.child("room");
         FirebaseRecyclerOptions<Room> options = new FirebaseRecyclerOptions.Builder<Room>()
                 .setQuery(myRef, Room.class)
                 .build();
-        FirebaseRecyclerAdapter adapter = new FirebaseRecyclerAdapter<Room, RoomViewHolder>(options) {
-            @Override
-            protected void onBindViewHolder(@NonNull RoomViewHolder holder, int position, @NonNull Room model) {
-                holder.setName(model.getName());
-                holder.setStatus(model.getStatus());
-                holder.setPlayerCount(model.getPlayerCount());
-                holder.setMaxPlayerCount(model.getMaxPlayerCount());
-            }
-
-            @NonNull
-            @Override
-            public RoomViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-                View v = inflater.inflate(R.layout.item_room, parent, false);
-                return new RoomViewHolder(v);
-            }
-        };
+        RecyclerRoomAdapter adapter = new RecyclerRoomAdapter(options);
         adapter.startListening();
-
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        adapter.addItemClickListener(new RecyclerRoomAdapter.ItemClickListener() {
+            @Override
+            public void onItemClick(Room room) {
+//                FirebaseSingleton.getInstance().updateListPlayer(MainActivity.usernameStatic,room);
+                startRoomActivity(room.getId());
+            }
+        });
 
+        flab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fm = getSupportFragmentManager();
+                CreateNewRoomDialogFragment userInfoDialog = CreateNewRoomDialogFragment.newInstance();
+                userInfoDialog.show(fm, null);
+                userInfoDialog.setCancelable(false); // cai nay k cho huy dialog khi an vo 1 vùng khac.oki
+                userInfoDialog.addCreateRoomListener(new CreateRoomListener() {
+                    @Override
+                    public void onCreateRoom(String name) {
+                        Room room = new Room(name, 2);
+                        room.addPlayer(playerName);
+                        FirebaseSingleton.getInstance().insert(room);
+                        //insertRoom(name);
+
+                        userInfoDialog.dismiss();
+
+                        startRoomActivity(room.getId());
+                    }
+                });
+            }
+        });
+    }
+
+    private void startRoomActivity(String roomId) {
+        Intent intent = new Intent(MenuRoomActivity.this, RoomActivity.class);
+        intent.putExtra("RoomId", roomId);
+        startActivity(intent);
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item){
+    public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
                 onBackPressed();
@@ -80,42 +96,5 @@ public class MenuRoomActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private class RoomViewHolder extends RecyclerView.ViewHolder {
-        TextView name;
-        TextView status;
-        TextView playerCount;
-        TextView maxPlayerCount;
 
-        public RoomViewHolder(@NonNull View itemView) {
-            super(itemView);
-
-            name = itemView.findViewById(R.id.tv_room_name);
-            status = itemView.findViewById(R.id.tv_status);
-            playerCount = itemView.findViewById(R.id.tv_player_count);
-            maxPlayerCount = itemView.findViewById(R.id.tv_max_player_count);
-
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(getApplication(), Integer.toString(getAdapterPosition()), Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
-
-        public void setName(String name) {
-            this.name.setText(name);
-        }
-
-        public void setStatus(int status) {
-            this.status.setText(Constraints.roomStatus(status));
-        }
-
-        public void setPlayerCount(int playerCount) {
-            this.playerCount.setText(Integer.toString(playerCount));
-        }
-
-        public void setMaxPlayerCount(int maxPlayerCount) {
-            this.maxPlayerCount.setText(Integer.toString(maxPlayerCount));
-        }
-    }
 }

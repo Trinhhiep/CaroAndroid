@@ -11,7 +11,7 @@
         android:layout_width="300dp"
         android:layout_height="50dp"
         android:hint="Username"
-        android:text="Hiep"
+        android:text="Hie"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.495"

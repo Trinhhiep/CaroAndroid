@@ -1,4 +1,4 @@
-package com.example.caroonline;
+package com.example.caroonline.models;
 
 public class Constraints {
     public static final int STATUS_WAITING = 0;

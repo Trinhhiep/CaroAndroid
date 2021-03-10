@@ -1,4 +1,4 @@
-package com.example.caroonline;
+package com.example.caroonline.models;
 
 public class User {
     private String username;

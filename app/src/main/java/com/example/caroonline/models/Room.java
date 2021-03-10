@@ -1,8 +1,5 @@
 package com.example.caroonline.models;
 
-import com.example.caroonline.Constraints;
-import com.example.caroonline.Utility;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +9,9 @@ public class Room {
     private List<String> playerIdList;
     private int maxPlayerCount;
     private int status;
+    public Room() {
 
+    }
     public int getStatus() {
         return status;
     }
@@ -23,10 +22,6 @@ public class Room {
 
     public List<String> getPlayerIdList() {
         return playerIdList;
-    }
-
-    public Room() {
-
     }
 
     public String getId() {

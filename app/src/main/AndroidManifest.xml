@@ -11,16 +11,19 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.CaroOnline">
+        <activity android:name=".RoomActivity">
+
+        </activity>
         <activity android:name=".MenuRoomActivity">
+
+        </activity>
+        <activity android:name=".RegisterActivity" />
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity android:name=".RegisterActivity" />
-        <activity android:name=".MainActivity">
-
         </activity>
     </application>
 
