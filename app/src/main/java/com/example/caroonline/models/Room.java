@@ -1,17 +1,24 @@
 package com.example.caroonline.models;
 
+import com.example.caroonline.Constraints;
+import com.example.caroonline.FirebaseSingleton;
+import com.example.caroonline.Utility;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Room {
     private String id;
     private String name;
-    private List<String> playerIdList;
+    private List<Player> playerList;
     private int maxPlayerCount;
     private int status;
+
     public Room() {
 
     }
+
+
     public int getStatus() {
         return status;
     }
@@ -20,8 +27,8 @@ public class Room {
         this.status = status;
     }
 
-    public List<String> getPlayerIdList() {
-        return playerIdList;
+    public List<Player> getPlayerList() {
+        return playerList;
     }
 
     public String getId() {
@@ -48,29 +55,56 @@ public class Room {
         this.name = name;
         this.maxPlayerCount = maxPlayerCount;
         this.id = Utility.generateRandomString();
-        this.playerIdList = new ArrayList<>();
+        this.playerList = new ArrayList<>();
         this.status = Constraints.STATUS_WAITING;
     }
 
-    public void addPlayer(String playerId) {
-        if (couldAddPlayer())
-            playerIdList.add(playerId);
-        updateStatus(playerIdList.size());
+    public void add(Player player) {
+        if (couldAddPlayer()){
+            playerList.add(player);
+        }
+        updateStatus(playerList.size());
     }
 
     private void updateStatus(int playerCount) {
-        if(playerCount == maxPlayerCount)
+        if (playerCount == maxPlayerCount) {
             status = Constraints.STATUS_READY;
+            return;
+        }
+        status = Constraints.STATUS_WAITING;
     }
 
-    private boolean couldAddPlayer() {
-        int playerCount = playerIdList.size();
-        if (playerCount < maxPlayerCount)
+    public boolean couldAddPlayer() {
+        if (this.getPlayerCount() < maxPlayerCount)
             return true;
         return false;
     }
 
+    public void remove(String playerName) {
+        boolean removePlayerIsAdmin = false;
+        for (Player player : playerList) {
+            if (player.getName().compareTo(playerName) == 0) {
+                if (player.isAdmin())
+                    removePlayerIsAdmin = true;
+                playerList.remove(player);
+                if (removePlayerIsAdmin)
+                    updateAdmin();
+                updateStatus(playerList.size());
+                return;
+            }
+        }
+        // khi 1 thang roi, neu no la chu phong thi dua chu ohong cho thang con lai, con k thi thoi.
+    }
+
+    private void updateAdmin() {
+        for (Player player : playerList
+        ) {
+            player.setAdmin(true);
+            return;
+        }
+    }
+
     public int getPlayerCount() {
-        return playerIdList.size();
+        return playerList.size();
     }
 }

@@ -1,9 +1,15 @@
 package com.example.caroonline;
 
+import androidx.annotation.NonNull;
+
+import com.example.caroonline.models.Player;
 import com.example.caroonline.models.Room;
 import com.example.caroonline.models.User;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class FirebaseSingleton {
     public DatabaseReference databaseReference;
@@ -16,11 +22,32 @@ public class FirebaseSingleton {
     public void insert(Room room) {// bef
         databaseReference.child("room").child(room.getId()).setValue(room);
     }
-public  void updateListPlayer(String username,Room room){
-        databaseReference.child("room").child(room.getId()).child("playerIdList").setValue(username);
-}
+
+    public void remove(String roomId){
+        databaseReference.child("room").child(roomId).setValue(null);
+    }
+
     public void insert(User user) {
         databaseReference.child("user").child(user.getUsername()).setValue(user);
+    }
+
+    public void remove(String roomId, String playerName){
+        databaseReference.child("room").child(roomId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Room room = snapshot.getValue(Room.class);
+                room.remove(playerName);
+
+                if(room.getPlayerCount() == 0)
+                    remove(roomId);
+                else insert(room);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
 

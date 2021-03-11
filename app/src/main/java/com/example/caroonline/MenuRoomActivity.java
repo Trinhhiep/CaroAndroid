@@ -7,37 +7,31 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.caroonline.models.Player;
 import com.example.caroonline.models.Room;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DatabaseReference;
 
+import java.util.List;
 
 public class MenuRoomActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     FloatingActionButton flab;
-    String playerName = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu_room);
 
-        Intent intent = getIntent();
-        if (intent.getStringExtra("username") != null) {
-            playerName = intent.getStringExtra("username");
-            String title = String.format("Hello %s", playerName);
-            setTitle(title); // ban coi lai cai item_room sau nha.oki  design coi sau het cug dc
-        }
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        String title = String.format("Hello %s", PlayerInfo.playerName);
+        setTitle(title); // ban coi lai cai item_room sau nha.oki  design coi sau het cug dc
 
-        recyclerView = findViewById(R.id.rv_room); // ok ve may cai setup chua ban//Utility là gi do
+        recyclerView = findViewById(R.id.rv_room);
         flab = findViewById(R.id.flab);
 
         DatabaseReference myRef = FirebaseSingleton.getInstance().databaseReference.child("room");
@@ -51,8 +45,14 @@ public class MenuRoomActivity extends AppCompatActivity {
         adapter.addItemClickListener(new RecyclerRoomAdapter.ItemClickListener() {
             @Override
             public void onItemClick(Room room) {
-//                FirebaseSingleton.getInstance().updateListPlayer(MainActivity.usernameStatic,room);
-                startRoomActivity(room.getId());
+                if (room.couldAddPlayer()) {
+                    Player player = new Player(PlayerInfo.playerName, false);
+                    room.add(player);
+                    FirebaseSingleton.getInstance().insert(room);
+                    startRoomActivity(room.getId());
+                } else
+                    Toast.makeText(MenuRoomActivity.this, "Room is full", Toast.LENGTH_SHORT).show();
+
             }
         });
 
@@ -65,11 +65,11 @@ public class MenuRoomActivity extends AppCompatActivity {
                 userInfoDialog.setCancelable(false); // cai nay k cho huy dialog khi an vo 1 vùng khac.oki
                 userInfoDialog.addCreateRoomListener(new CreateRoomListener() {
                     @Override
-                    public void onCreateRoom(String name) {
-                        Room room = new Room(name, 2);
-                        room.addPlayer(playerName);
+                    public void onCreateRoom(String roomName) {
+                        Room room = new Room(roomName, 2);
+                        Player player = new Player(PlayerInfo.playerName, true);
+                        room.add(player);
                         FirebaseSingleton.getInstance().insert(room);
-                        //insertRoom(name);
 
                         userInfoDialog.dismiss();
 
@@ -80,20 +80,21 @@ public class MenuRoomActivity extends AppCompatActivity {
         });
     }
 
+    private Player getAdmin(Room room) {
+        Player admin = null;
+        List<Player> list = room.getPlayerList();
+        for (Player p : list) {
+            if (p.isAdmin())
+                admin = p;
+        }
+        return admin;
+    }
+
     private void startRoomActivity(String roomId) {
         Intent intent = new Intent(MenuRoomActivity.this, RoomActivity.class);
         intent.putExtra("RoomId", roomId);
-        startActivity(intent);
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
+        startActivity(intent);
     }
 
 

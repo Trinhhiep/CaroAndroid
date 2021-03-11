@@ -13,14 +13,22 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.caroonline.models.Player;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.List;
 
 
-public class RecyclerPlayerAdapter extends FirebaseRecyclerAdapter<String, RecyclerPlayerAdapter.UserViewHolder> {
+public class RecyclerPlayerAdapter extends FirebaseRecyclerAdapter<Player, RecyclerPlayerAdapter.UserViewHolder> {
 
-    public RecyclerPlayerAdapter(@NonNull FirebaseRecyclerOptions<String> options) {
+
+    public RecyclerPlayerAdapter(@NonNull FirebaseRecyclerOptions<Player> options) {
         super(options);
+
     }
 
     @NonNull
@@ -32,44 +40,44 @@ public class RecyclerPlayerAdapter extends FirebaseRecyclerAdapter<String, Recyc
         return new UserViewHolder(v);
     }
 
+
+
     @Override
-    protected void onBindViewHolder(@NonNull UserViewHolder holder, int position, @NonNull String model) {
-        if (position == 0) {//cái này phải là position trong room.listIdPlayer
-            holder.setAdmin(true);
-        }
-        if (holder.isAdmin)
-        {
-            holder.imageView.setVisibility(View.VISIBLE);
-            if(holder.userName.toString().compareTo(MainActivity.usernameStatic)==0)
-            holder.btnStart.setVisibility(View.VISIBLE);
-        }
-        if (model.compareTo(MainActivity.usernameStatic) == 0) {
-            holder.setUserName(model, Color.parseColor("#ff008000"));
-        } else
-            holder.setUserName(model, Color.parseColor("#AAAAAA"));
+    protected void onBindViewHolder(@NonNull UserViewHolder holder, int position, @NonNull Player model) {
+        // set name
+        holder.setUserName(model.getName());
+        // show admin
+        if(model.isAdmin())
+            holder.setVisibility(true);
+        else holder.setVisibility(false);
+        // chinh chu thi mau xanh
+        if(model.getName().compareTo(PlayerInfo.playerName) == 0)
+            holder.setColor(Constraints.PLAYER_COLOR);
     }
 
 
     public class UserViewHolder extends RecyclerView.ViewHolder {
         TextView userName;
-        boolean isAdmin = false;
         ImageView imageView;
-Button btnStart;
-        public void setUserName(String userName, int color) {
-            this.userName.setText(userName);
-            this.userName.setTextColor(color);
 
+        public void setUserName(String userName) {
+            this.userName.setText(userName);
         }
 
-        public void setAdmin(boolean admin) {
-            isAdmin = admin;
+        public void setColor(int playerColor) {
+            this.userName.setTextColor(playerColor);
+        }
+
+        public void setVisibility(boolean isAdmin) {
+            if(isAdmin)
+                this.imageView.setVisibility(View.VISIBLE);
+            else this.imageView.setVisibility(View.INVISIBLE);
         }
 
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);
             userName = itemView.findViewById(R.id.tv_userName);
             imageView = itemView.findViewById(R.id.im_ic_home);
-            btnStart = itemView.findViewById(R.id.btn_start);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -77,5 +85,8 @@ Button btnStart;
                 }
             });
         }
+
+
+
     }
 }

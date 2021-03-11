@@ -1,9 +1,9 @@
-package com.example.caroonline.models;
+package com.example.caroonline;
 
 import android.content.Context;
 import android.util.DisplayMetrics;
 
-import com.example.caroonline.models.Constraints;
+import com.example.caroonline.Constraints;
 
 import java.util.Random;
 
