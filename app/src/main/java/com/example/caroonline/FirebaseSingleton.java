@@ -2,6 +2,7 @@ package com.example.caroonline;
 
 import androidx.annotation.NonNull;
 
+import com.example.caroonline.models.Game;
 import com.example.caroonline.models.Player;
 import com.example.caroonline.models.Room;
 import com.example.caroonline.models.User;
@@ -29,6 +30,9 @@ public class FirebaseSingleton {
 
     public void insert(User user) {
         databaseReference.child("user").child(user.getUsername()).setValue(user);
+    }
+    public  void insert(Game game){
+        databaseReference.child("game").child(game.getRoomId()).setValue(game);
     }
 
     public void remove(String roomId, String playerName){

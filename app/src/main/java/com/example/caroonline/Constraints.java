@@ -8,6 +8,7 @@ public class Constraints {
     public static final int STATUS_READY = 2;
     public static final int SPAN_COUNT_ITEM_NODE = 16;
     public static final int PLAYER_COLOR = Color.parseColor("#ff008000");
+    public static final int  SPAN_COUNT_ITEM_IMAGE=20;
 
     public static String roomStatus(int status){
         if(status == STATUS_WAITING)

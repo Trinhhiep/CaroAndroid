@@ -15,7 +15,9 @@ public class Utility {
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         return displayMetrics.widthPixels;
     }
-
+    public static int widthOfImage(Context context) {
+        return (widthPixelsDp(context) / Constraints.SPAN_COUNT_ITEM_IMAGE) - 1;
+    }
     public static int widthOfNode(Context context) {
         return (widthPixelsDp(context) / Constraints.SPAN_COUNT_ITEM_NODE) - 1;
     }

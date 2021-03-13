@@ -41,17 +41,16 @@ public class RecyclerPlayerAdapter extends FirebaseRecyclerAdapter<Player, Recyc
     }
 
 
-
     @Override
     protected void onBindViewHolder(@NonNull UserViewHolder holder, int position, @NonNull Player model) {
         // set name
         holder.setUserName(model.getName());
         // show admin
-        if(model.isAdmin())
-            holder.setVisibility(true);
-        else holder.setVisibility(false);
+        if (model.isAdmin())
+            holder.setVisibility(true, model);
+        else holder.setVisibility(false, model);
         // chinh chu thi mau xanh
-        if(model.getName().compareTo(PlayerInfo.playerName) == 0)
+        if (model.getName().compareTo(PlayerInfo.playerName) == 0)
             holder.setColor(Constraints.PLAYER_COLOR);
     }
 
@@ -59,6 +58,7 @@ public class RecyclerPlayerAdapter extends FirebaseRecyclerAdapter<Player, Recyc
     public class UserViewHolder extends RecyclerView.ViewHolder {
         TextView userName;
         ImageView imageView;
+
 
         public void setUserName(String userName) {
             this.userName.setText(userName);
@@ -68,14 +68,17 @@ public class RecyclerPlayerAdapter extends FirebaseRecyclerAdapter<Player, Recyc
             this.userName.setTextColor(playerColor);
         }
 
-        public void setVisibility(boolean isAdmin) {
-            if(isAdmin)
+        public void setVisibility(boolean isAdmin, Player p) {
+            if (isAdmin) {
                 this.imageView.setVisibility(View.VISIBLE);
-            else this.imageView.setVisibility(View.INVISIBLE);
+
+            } else this.imageView.setVisibility(View.INVISIBLE);
         }
 
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);
+
+
             userName = itemView.findViewById(R.id.tv_userName);
             imageView = itemView.findViewById(R.id.im_ic_home);
             itemView.setOnClickListener(new View.OnClickListener() {
@@ -87,6 +90,7 @@ public class RecyclerPlayerAdapter extends FirebaseRecyclerAdapter<Player, Recyc
         }
 
 
-
     }
+
+
 }

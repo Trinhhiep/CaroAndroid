@@ -1,5 +1,6 @@
 package com.example.caroonline;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -7,6 +8,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.PersistableBundle;
 import android.view.View;
 import android.widget.Toast;
 
@@ -21,15 +24,22 @@ import java.util.List;
 public class MenuRoomActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     FloatingActionButton flab;
-
+    String playerName;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu_room);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        if(savedInstanceState!=null){
+         playerName = savedInstanceState.getString("PlayerInfo");
+            String title = String.format("Hello %s", playerName);
+        }
 
         String title = String.format("Hello %s", PlayerInfo.playerName);
-        setTitle(title); // ban coi lai cai item_room sau nha.oki  design coi sau het cug dc
+        setTitle(title);
 
         recyclerView = findViewById(R.id.rv_room);
         flab = findViewById(R.id.flab);
@@ -80,6 +90,12 @@ public class MenuRoomActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState, @NonNull PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+        outState.putString("PlayerInfo",PlayerInfo.playerName);
+    }
+
     private Player getAdmin(Room room) {
         Player admin = null;
         List<Player> list = room.getPlayerList();
@@ -96,6 +112,8 @@ public class MenuRoomActivity extends AppCompatActivity {
 
         startActivity(intent);
     }
+    public void onBackPressed() {
 
+    }
 
 }
