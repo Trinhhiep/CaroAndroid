@@ -13,6 +13,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.example.caroonline.models.Game;
+import com.example.caroonline.models.Node;
 import com.example.caroonline.models.Player;
 import com.example.caroonline.models.Room;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -21,6 +23,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RoomActivity extends AppCompatActivity {
@@ -28,6 +31,7 @@ public class RoomActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     Button btnPlay;
     boolean doubleBackToExitPressedOnce = false;
+    int imageId = Constraints.IMAGE_ID_O ;// mặc định là O; llonj bạn ơi. phải từ đây chứ. ok chưa.ok
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,14 +83,25 @@ public class RoomActivity extends AppCompatActivity {
         });
 
 
-        btnPlay.setOnClickListener(new View.OnClickListener() {
+        btnPlay.setOnClickListener(new View.OnClickListener() { // ghi nhấn play thì cho tạo game luôn nha bạn.chi, thì tạo game đó bạn. vô trong kia load liíist node thôi. game đc tạo trc.oki
             @Override
             public void onClick(View v) {
+                // thằng start thì cho nó khác đi nha.
+                imageId = Constraints.IMAGE_ID_X;
                 FirebaseSingleton.getInstance().databaseReference.child("room").child(roomId).child("status").setValue(Constraints.STATUS_PLAYING);
+                createGame(roomId);
             }
         });
 
+    }
 
+    private void createGame(String roomId){
+        List<Node> lst = new ArrayList<>();
+        for (int i = 1; i <= 300; i++) {
+            lst.add(new Node(Constraints.IMAGE_ID_NULL)); // mới tạo thì đương nhiên nó rỗng r.
+        }
+        Game game = new Game(roomId, lst,Constraints.IMAGE_ID_X);// set cho thang chu danh truoc luon
+        FirebaseSingleton.getInstance().insert(game);
     }
 
     private void actionDependsOnStatus(Room r) {
@@ -105,8 +120,8 @@ public class RoomActivity extends AppCompatActivity {
 
     private void startGameActivity() {
         Intent intent = new Intent(RoomActivity.this, GameActivity.class);
-        intent.putExtra("RoomId", roomId);
-
+        String[] info = {roomId, Integer.toString(imageId)}; // đưa vô đây để qua kia biết nha bạn.ok
+        intent.putExtra("Info", info);//bo cai nay
         startActivity(intent);
     }
 

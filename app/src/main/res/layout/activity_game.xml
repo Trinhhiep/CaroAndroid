@@ -6,12 +6,53 @@
     android:layout_height="match_parent"
     tools:context=".GameActivity">
 
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:orientation="vertical">
+
+    <Button
+    android:id="@+id/btn_newgame"
+    android:text="NewGame"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"/>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"    >
+        <TextView
+            android:id="@+id/tv_yourturn"
+            android:text="YOUR TURN"
+            android:gravity="center"
+            android:layout_margin="2dp"
+            android:layout_width="200dp"
+            android:layout_height="match_parent">
+        </TextView>
+        <TextView
+            android:id="@+id/tv_orther"
+            android:text="ORTHER"
+            android:gravity="center"
+            android:layout_margin="2dp"
+
+            android:layout_width="200dp"
+            android:layout_height="match_parent">
+        </TextView>
+
+    </LinearLayout>
+
+    </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rcv_node"
         android:layout_width="match_parent"
-        android:layout_height="450dp"
+        android:layout_height="500dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        app:layout_constraintVertical_bias="1.0">
 
     </androidx.recyclerview.widget.RecyclerView>
 

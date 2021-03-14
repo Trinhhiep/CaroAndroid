@@ -1,5 +1,6 @@
 package com.example.caroonline;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -18,15 +19,22 @@ import com.example.caroonline.models.Game;
 import com.example.caroonline.models.Node;
 import com.example.caroonline.models.Room;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class GameActivity extends AppCompatActivity {
     String roomId;
+    int imageId;
     RecyclerView recyclerView;
-    boolean doubleBackToExitPressedOnce = false;
+    boolean isTurn= false;
+    boolean doubleBackToExitPressedOnce = false; // giờ mình sẽ tạo 1 biến để ghi nhớ node cần đánh.
+    int currentPlayer;// luu thang nao duoc danh tiep theo
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,19 +44,39 @@ public class GameActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         Intent intent = getIntent();
-        if (intent.getStringExtra("RoomId") != null) {
-            roomId = intent.getStringExtra("RoomId");
+        if (intent.getStringArrayExtra("Info") != null) {
+            String[] info = intent.getStringArrayExtra("Info");
+            roomId = info[0];
+            imageId = Integer.parseInt(info[1]); // ok chưa obkạn
             setTitle(roomId);
         }
-        recyclerView=findViewById(R.id.rcv_node);
 
-        Game game = new Game(roomId,new ArrayList<Node>());
-        List<Node>  lst= new ArrayList<Node>();
-        for(int i=0 ;i<=99;i++){
-            lst.add(new Node("",null,null));
+        // lấy current vè
+        FirebaseSingleton.getInstance().databaseReference.child("game").child(roomId).child("currentPlayer").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                int current = snapshot.getValue(int.class);
+                currentPlayer = current;
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        if (imageId != currentPlayer) {
+           isTurn = false;
+            //khoa lai
+        } else {
+        isTurn=true;
+            //mo ra
         }
-        game.setListNode(lst);
-        FirebaseSingleton.getInstance().insert(game);
+        recyclerView = findViewById(R.id.rcv_node);
+
+
+
+
         DatabaseReference myRef = FirebaseSingleton.getInstance().databaseReference.child("game").child(roomId).child("listNode");
         FirebaseRecyclerOptions<Node> options = new FirebaseRecyclerOptions.Builder<Node>()
                 .setQuery(myRef, Node.class)
@@ -56,11 +84,29 @@ public class GameActivity extends AppCompatActivity {
         RecyclerNodeAdapter adapter = new RecyclerNodeAdapter(options, this);
         adapter.startListening();
         recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new GridLayoutManager(this,10));
+        recyclerView.setLayoutManager(new GridLayoutManager(this, Constraints.SPAN_COUNT_ITEM_IMAGE));
 
 
+
+        adapter.addItemClickListener(new RecyclerNodeAdapter.ItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+
+                if(isTurn) {
+                    FirebaseSingleton.getInstance().insert(roomId, position, imageId);
+                    FirebaseSingleton.getInstance().databaseReference.child("game").child(roomId).child("currentPlayer").setValue(changeCurrent(currentPlayer));
+                }
+
+            }
+        });
     }
-
+private int changeCurrent(int currentPlayer)
+{
+    if (currentPlayer == Constraints.IMAGE_ID_X)
+        return Constraints.IMAGE_ID_O;
+    else
+        return Constraints.IMAGE_ID_X;
+}
     @Override
     public void onBackPressed() {
         if (doubleBackToExitPressedOnce) {
@@ -69,7 +115,6 @@ public class GameActivity extends AppCompatActivity {
             super.onBackPressed();
             finish();
             startMenuRoomActivity();
-
 
 
             return;
@@ -95,6 +140,7 @@ public class GameActivity extends AppCompatActivity {
     private void removePlayer() {
         FirebaseSingleton.getInstance().remove(roomId, PlayerInfo.playerName);
     }
+
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:

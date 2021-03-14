@@ -1,45 +1,26 @@
 package com.example.caroonline.models;
 
-import android.graphics.Point;
-import android.widget.ImageView;
+public class Node { //đợi mình nói nè. adpater = data + viewholder. // r bạn sẽ nghĩ tới việc làm sao để lưu đặc điểm cái hhinhf ảnh hiển thị ra.
+    int imageId; // bạn nghĩ sẽ cho 1 cái name: nếu name là "0" thì hình 0 "x" thì hình x,......
 
-public class Node {
-    String playerName;
-    Point point;
-    ImageView imageView;
 
-    public ImageView getImageView() {
-        return imageView;
+
+
+    public Node(int imageId) {
+        this.imageId = imageId;
+
     }
 
-    public void setImageView(ImageView imageView) {
-        this.imageView = imageView;
-    }
-
-    public Node(String playerName, Point point, ImageView imageView) {
-        this.playerName = playerName;
-        this.point = point;
-        this.imageView = imageView;
-    }
     public Node(){
 
     }
 
-    public String getPlayerName() {
-        return playerName;
+    public int getImageId() {
+        return imageId;
     }
 
-    public void setPlayerName(String playerName) {
-        this.playerName = playerName;
+    public void setImageId(int imageId) {
+        this.imageId = imageId;
     }
-
-    public Point getPoint() {
-        return point;
-    }
-
-    public void setPoint(Point point) {
-        this.point = point;
-    }
-
 
 }

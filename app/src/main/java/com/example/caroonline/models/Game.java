@@ -5,6 +5,16 @@ import java.util.List;
 
 public class Game {
     String roomId;
+    int currentPlayer;
+
+    public int getCurrentPlayer() {
+        return currentPlayer;
+    }
+
+    public void setCurrentPlayer(int currentPlayer) {
+        this.currentPlayer = currentPlayer;
+    }
+
     List<Node> listNode ;
 
     public String getRoomId() {
@@ -22,9 +32,10 @@ public class Game {
     public void setListNode(List<Node> listNode) {
         this.listNode = listNode;
     }
-    public Game(String roomId, ArrayList<Node> nodes) {
-        this.roomId = roomId;
-        this.listNode = new ArrayList<>();
 
+    public Game(String roomId, List<Node> nodes,int currentPlayer) {
+        this.roomId = roomId;
+        this.listNode = nodes;
+this.currentPlayer=currentPlayer;
     }
 }

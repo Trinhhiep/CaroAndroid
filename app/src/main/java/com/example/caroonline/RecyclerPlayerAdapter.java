@@ -42,7 +42,7 @@ public class RecyclerPlayerAdapter extends FirebaseRecyclerAdapter<Player, Recyc
 
 
     @Override
-    protected void onBindViewHolder(@NonNull UserViewHolder holder, int position, @NonNull Player model) {
+    protected void onBindViewHolder(@NonNull UserViewHolder holder, int position, @NonNull Player model) { // postion kìa bạn
         // set name
         holder.setUserName(model.getName());
         // show admin
