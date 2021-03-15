@@ -10,38 +10,43 @@
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="90dp"
+        android:orientation="vertical"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:orientation="vertical">
+        app:layout_constraintTop_toTopOf="parent">
 
-    <Button
-    android:id="@+id/btn_newgame"
-    android:text="NewGame"
-    android:layout_width="match_parent"
-    android:layout_height="50dp"/>
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"    >
-        <TextView
-            android:id="@+id/tv_yourturn"
-            android:text="YOUR TURN"
+        <Button
+            android:id="@+id/btn_newgame"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@color/black"
+            android:text="@string/newgame" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
             android:gravity="center"
-            android:layout_margin="2dp"
-            android:layout_width="200dp"
-            android:layout_height="match_parent">
-        </TextView>
-        <TextView
-            android:id="@+id/tv_orther"
-            android:text="ORTHER"
-            android:gravity="center"
-            android:layout_margin="2dp"
+            android:orientation="horizontal">
 
-            android:layout_width="200dp"
-            android:layout_height="match_parent">
-        </TextView>
+            <TextView
+                android:id="@+id/tv_yourturn"
+                android:layout_width="200dp"
+                android:layout_height="match_parent"
+                android:layout_margin="2dp"
+                android:background="#ff99cc00"
+                android:gravity="center"
+                android:text="@string/your_turn"
+                android:textColor="#000000"></TextView>
 
-    </LinearLayout>
+            <TextView
+                android:id="@+id/tv_orther"
+                android:layout_width="200dp"
+                android:layout_height="match_parent"
+                android:layout_margin="2dp"
+
+                android:gravity="center"
+                android:text="@string/orther"></TextView>
+
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -49,10 +54,9 @@
         android:id="@+id/rcv_node"
         android:layout_width="match_parent"
         android:layout_height="500dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="8dp"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout"
-        app:layout_constraintVertical_bias="1.0">
+        tools:layout_editor_absoluteX="0dp">
 
     </androidx.recyclerview.widget.RecyclerView>
 

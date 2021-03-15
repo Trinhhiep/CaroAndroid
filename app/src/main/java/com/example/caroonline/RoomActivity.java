@@ -31,7 +31,8 @@ public class RoomActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     Button btnPlay;
     boolean doubleBackToExitPressedOnce = false;
-    int imageId = Constraints.IMAGE_ID_O ;// mặc định là O; llonj bạn ơi. phải từ đây chứ. ok chưa.ok
+    int imageId = Constraints.IMAGE_ID_O;// mặc định là O; llonj bạn ơi. phải từ đây chứ. ok chưa.ok
+    String adminId = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +60,7 @@ public class RoomActivity extends AppCompatActivity {
         adapter.startListening();// adapter kết nối layout item với data. mà bạn bảo là item  kì v.
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        FirebaseSingleton.getInstance().databaseReference.child("room").child(roomId).addValueEventListener(new ValueEventListener() {
+        FirebaseSingleton.getInstance().databaseReference.child("room").child(roomId).addValueEventListener(new ValueEventListener() {   // ban lam cai nay tao lao thoi
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Room r = snapshot.getValue(Room.class);
@@ -67,11 +68,14 @@ public class RoomActivity extends AppCompatActivity {
                     actionDependsOnStatus(r);
                     for (Player p : r.getPlayerList()
                     ) {
-                        if (p.getName().compareTo(PlayerInfo.playerName) == 0 && p.isAdmin()) {
-                            btnPlay.setVisibility(View.VISIBLE);
-
-                            return;
+                        if (p.isAdmin()) {
+                            adminId = p.getName();
+                            if (p.getName().compareTo(PlayerInfo.playerName) == 0) { // okla chua ban. ok hon nè . logic cua ban bi tha hoa r.test
+                                btnPlay.setVisibility(View.VISIBLE);
+                                return;
+                            }
                         }
+
                     }
                 }
             }
@@ -95,12 +99,12 @@ public class RoomActivity extends AppCompatActivity {
 
     }
 
-    private void createGame(String roomId){
+    private void createGame(String roomId) {
         List<Node> lst = new ArrayList<>();
-        for (int i = 1; i <= 300; i++) {
+        for (int i = 1; i <= Constraints.COUNT_ITEM_IMAGE; i++) {
             lst.add(new Node(Constraints.IMAGE_ID_NULL)); // mới tạo thì đương nhiên nó rỗng r.
         }
-        Game game = new Game(roomId, lst,Constraints.IMAGE_ID_X);// set cho thang chu danh truoc luon
+        Game game = new Game(roomId, lst, Constraints.IMAGE_ID_O);// set cho thang chu danh truoc luon
         FirebaseSingleton.getInstance().insert(game);
     }
 
@@ -120,7 +124,7 @@ public class RoomActivity extends AppCompatActivity {
 
     private void startGameActivity() {
         Intent intent = new Intent(RoomActivity.this, GameActivity.class);
-        String[] info = {roomId, Integer.toString(imageId)}; // đưa vô đây để qua kia biết nha bạn.ok
+        String[] info = {roomId, Integer.toString(imageId), adminId}; // neu la khach thi admin van chua co gi.
         intent.putExtra("Info", info);//bo cai nay
         startActivity(intent);
     }

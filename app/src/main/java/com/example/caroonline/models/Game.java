@@ -6,7 +6,7 @@ import java.util.List;
 public class Game {
     String roomId;
     int currentPlayer;
-
+    List<Node> listNode ;
     public int getCurrentPlayer() {
         return currentPlayer;
     }
@@ -15,7 +15,7 @@ public class Game {
         this.currentPlayer = currentPlayer;
     }
 
-    List<Node> listNode ;
+
 
     public String getRoomId() {
         return roomId;

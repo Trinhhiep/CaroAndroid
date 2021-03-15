@@ -35,6 +35,7 @@ public class FirebaseSingleton {
         databaseReference.child("game").child(game.getRoomId()).setValue(game);
     }
 
+
     public void insert(String roomId, int position, int imageId){
         databaseReference.child("game").child(roomId).child("listNode").child(Integer.toString(position)).child("imageId").setValue(imageId); //hihi quen bạn ơi.// dể mình test đã chứ.ok
     }

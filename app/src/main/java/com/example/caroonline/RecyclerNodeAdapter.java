@@ -25,18 +25,16 @@ public class RecyclerNodeAdapter extends FirebaseRecyclerAdapter<Node, RecyclerN
 
     @Override
     protected void onBindViewHolder(@NonNull NodeViewHolder holder, int position, @NonNull Node model) {
-        if (model.getImageId() == Constraints.IMAGE_ID_NULL) // cái này ddeer nó rỗng ok
+        if (model.getImageId() == Constraints.IMAGE_ID_NULL) { // test. tututtu
+            if(holder.iv_node.getBackground() != null)
+                holder.iv_node.setBackground(null);
             return;
-        if (holder.iv_node.getBackground() != null) {
-            return;
-        } else if (model.getImageId() == Constraints.IMAGE_ID_O) {// vầy cho clean nha bạn.ok
-            //tip bn oi. r giờ bạn coi lại cái logic mình nói nãy giờ. sau khi thông não r thì làm cái online đi.// ko có tao do thi lam sao bn
+        } else if (model.getImageId() == Constraints.IMAGE_ID_O) {
             Glide.with(context)
                     .load(R.drawable.ic_o)
                     .error(R.drawable.ic_o)
                     .fitCenter()
                     .into(holder.iv_node);
-            holder.iv_node.setClickable(false);
         } else {
             Glide.with(context)
                     .load(R.drawable.ic_x)
@@ -44,7 +42,6 @@ public class RecyclerNodeAdapter extends FirebaseRecyclerAdapter<Node, RecyclerN
                     .fitCenter()
                     .into(holder.iv_node);
 
-            holder.iv_node.setClickable(false);
         }
     }
 

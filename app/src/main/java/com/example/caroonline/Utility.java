@@ -3,8 +3,6 @@ package com.example.caroonline;
 import android.content.Context;
 import android.util.DisplayMetrics;
 
-import com.example.caroonline.Constraints;
-
 import java.util.Random;
 
 public class Utility {
@@ -16,7 +14,7 @@ public class Utility {
         return displayMetrics.widthPixels;
     }
     public static int widthOfImage(Context context) {
-        return (widthPixelsDp(context) / Constraints.SPAN_COUNT_ITEM_IMAGE) - 2;
+        return (widthPixelsDp(context) / Constraints.COLUMN_COUNT_ITEM_IMAGE) - 2;
     }
     public static int widthOfNode(Context context) {
         return (widthPixelsDp(context) / Constraints.SPAN_COUNT_ITEM_NODE) - 1;

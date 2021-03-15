@@ -15,10 +15,12 @@ public class Node { //đợi mình nói nè. adpater = data + viewholder. // r b
 
     }
 
+    // get moi la get.
     public int getImageId() {
         return imageId;
     }
 
+    // set la set
     public void setImageId(int imageId) {
         this.imageId = imageId;
     }
