@@ -81,11 +81,13 @@ public class GameActivity extends AppCompatActivity {
         adapter.addItemClickListener(new RecyclerNodeAdapter.ItemClickListener() {
             @Override
             public void onItemClick(int position) {
-
-
                 if (isYourTurning) {
-                    FirebaseSingleton.getInstance().insert(roomId, position, imageId);
-                    FirebaseSingleton.getInstance().databaseReference.child("game").child(roomId).child("currentPlayer").setValue(changeCurrent(currentPlayer));
+                    int x = position / Constraints.COLUMN_COUNT_ITEM_IMAGE;
+                    int y = position % Constraints.COLUMN_COUNT_ITEM_IMAGE;
+                    if (matrix[x][y] == Constraints.IMAGE_ID_NULL) {
+                        FirebaseSingleton.getInstance().insert(roomId, position, imageId);
+                        FirebaseSingleton.getInstance().databaseReference.child("game").child(roomId).child("currentPlayer").setValue(changeCurrent(currentPlayer));
+                    }
                 }
 
             }
@@ -166,6 +168,15 @@ public class GameActivity extends AppCompatActivity {
             return false;
     }
 
+    private boolean isOnChessBoard(int x, int y) {
+
+        if (x >= Constraints.ROW_COUNT_ITEM_IMAGE || x < 0
+                || y >= Constraints.COLUMN_COUNT_ITEM_IMAGE || y < 0) {
+            return false;
+        }
+        return true;
+    }
+
     private boolean isEndSecondary(int[][] matrix, int x, int y, int imageId) {
         int endPoint = 0;
         int count = 0;
@@ -200,76 +211,62 @@ public class GameActivity extends AppCompatActivity {
 
     }
 
-    private boolean isOnChessBoard(int x, int y) {
-        if (x >= Constraints.ROW_COUNT_ITEM_IMAGE || x < 0
-                || y >= Constraints.COLUMN_COUNT_ITEM_IMAGE || y < 0) {
-            return false;
-        }
-        return true;
-    }
 
     private boolean isEndMain(int[][] matrix, int x, int y, int value) {
         int endPoint = 0;
-        int topLeft = 0;
-        for (int i = 0; i <= x; i++) {
-            if (x - i < 0 || y - i < 0) break;
-            if (matrix[x - i][y - i] == value) {
-                topLeft++;
-            } else if (matrix[x - i][y - i] == Constraints.IMAGE_ID_NULL) break;
-            else {
+        int count = 0;
+        int id;
+        for (int i = 0; i <= 6; i++) {
+            if (!isOnChessBoard(x - i, y - i)) break;
+            id = matrix[x - i][y - i];
+            if (id == value) {
+                count++;
+            } else if (id != Constraints.IMAGE_ID_NULL)
                 endPoint++;
-                break;
-            }
+            break;
+
         }
 
-        int bottomRight = 0;
 
-        for (int i = 1; i <= Constraints.ROW_COUNT_ITEM_IMAGE - x; i++) {
-            if (x + i > Constraints.ROW_COUNT_ITEM_IMAGE || y + i > Constraints.COLUMN_COUNT_ITEM_IMAGE)
+        for (int i = 1; i <= 6; i++) {
+            if (!isOnChessBoard(x + i, y + i))
                 break;
-            if (matrix[x + i][y + i] == value) {
-                bottomRight++;
-            } else if (matrix[x + i][y + i] == Constraints.IMAGE_ID_NULL) break;
-            else {
+            id = matrix[x + i][y + i];
+            if (id == value) {
+                count++;
+            } else if (id != Constraints.IMAGE_ID_NULL)
                 endPoint++;
-                break;
-            }
-        }
-        if (endPoint != 2)
-            return topLeft + bottomRight == 5;
+            break;
 
-        else
-            return false;
+        }
+        return hasWin(count, endPoint);
 
     }
 
     private boolean isEndVertical(int[][] matrix, int x, int y, int value) {
         int endPoint = 0;
-        int top = 0;
+        int count = 0;
+        int id;
         for (int i = x; i >= 0; i--) {
-            if (matrix[i][y] == value) {
-                top++;
-            } else if (matrix[i][y] == Constraints.IMAGE_ID_NULL) break;
-            else {
+            id = matrix[i][y];
+            if (id == value) {
+                count++;
+            } else if (id == Constraints.IMAGE_ID_NULL)
                 endPoint++;
-                break;
-            }
+            break;
+
         }
-        //duyet ben phai
-        int bottom = 0;
-        for (int j = x + 1; j <= Constraints.ROW_COUNT_ITEM_IMAGE; j++) {
-            if (matrix[j][y] == value) {
-                bottom++;
-            } else if (matrix[j][y] == Constraints.IMAGE_ID_NULL) break;
-            else {
+        for (int j = x + 1; j <= x + 1 + 6; j++) {
+            id = matrix[j][y];
+            if (id == value) {
+                count++;
+            } else if (id == Constraints.IMAGE_ID_NULL)
+
                 endPoint++;
-                break;
-            }
+            break;
+
         }
-        if (endPoint != 2)
-            return top + bottom == 5;
-        else
-            return false;
+        return hasWin(count, endPoint);
 
 
     }
@@ -277,31 +274,28 @@ public class GameActivity extends AppCompatActivity {
     private boolean isEndHorizontal(int[][] matrix, int x, int y, int value) {
 //duyệt ben trái
         int endPoint = 0;
-        int left = 0;
+        int count = 0;
+        int id;
         for (int i = y; i >= 0; i--) {
-            if (matrix[x][i] == value) {
-                left++;
-            } else if (matrix[x][i] == Constraints.IMAGE_ID_NULL) break;
-            else {
+            id = matrix[x][i];
+            if (id == value) {
+                count++;
+            } else if (id == Constraints.IMAGE_ID_NULL)
                 endPoint++;
-                break;
-            }
+            break;
         }
-        //duyet ben phai
-        int right = 0;
-        for (int j = y + 1; j <= Constraints.COLUMN_COUNT_ITEM_IMAGE; j++) {
-            if (matrix[x][j] == value) {
-                right++;
-            } else if (matrix[x][j] == Constraints.IMAGE_ID_NULL) break;
-            else {
+
+        for (int j = y + 1; j <= y + 1 + 6; j++) {
+            id = matrix[x][j];
+            if (id == value) {
+                count++;
+            } else if (id == Constraints.IMAGE_ID_NULL)
+
                 endPoint++;
-                break;
-            }
+            break;
+
         }
-        if (endPoint != 2)
-            return left + right == 5;
-        else
-            return false;
+        return hasWin(count, endPoint);
     }
 
     private int checkLaw(int x) {

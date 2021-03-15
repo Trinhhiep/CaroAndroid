@@ -92,8 +92,8 @@ public class RoomActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // thằng start thì cho nó khác đi nha.
                 imageId = Constraints.IMAGE_ID_X;
-                FirebaseSingleton.getInstance().databaseReference.child("room").child(roomId).child("status").setValue(Constraints.STATUS_PLAYING);
                 createGame(roomId);
+                FirebaseSingleton.getInstance().databaseReference.child("room").child(roomId).child("status").setValue(Constraints.STATUS_PLAYING);
             }
         });
 
