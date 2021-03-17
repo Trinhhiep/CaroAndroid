@@ -17,6 +17,7 @@ public class Constraints {
     public static final int IMAGE_ID_O = 1;
     public static final int IMAGE_ID_X = 2;
     public static final int IMAGE_ID_NULL = 0;
+    public static final int MAX_PLAYER_COUNT = 2;
 
     public static String roomStatus(int status){
         if(status == STATUS_WAITING)

@@ -19,13 +19,14 @@ public class RecyclerRoomAdapter extends FirebaseRecyclerAdapter<Room, RecyclerR
     public RecyclerRoomAdapter(@NonNull FirebaseRecyclerOptions<Room> options) {
         super(options);
     }
+    // sao bạn đ*o  nói  sớm nhung cái room cung phai sua ma, minh tuong ban sua list room truoc
 
     @Override
     protected void onBindViewHolder(@NonNull RoomViewHolder holder, int position, @NonNull Room model) {
         holder.setName(model.getName());
         holder.setStatus(model.getStatus());
         holder.setPlayerCount(model.getPlayerCount());
-        holder.setMaxPlayerCount(model.getMaxPlayerCount());
+        holder.setMaxPlayerCount(Constraints.MAX_PLAYER_COUNT);
         holder.setRoom(model);
     }
 

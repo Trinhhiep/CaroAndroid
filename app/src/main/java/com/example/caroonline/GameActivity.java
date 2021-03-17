@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.example.caroonline.models.Game;
 import com.example.caroonline.models.Node;
+import com.example.caroonline.models.Room;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -32,8 +33,8 @@ public class GameActivity extends AppCompatActivity {
     String adminId;
     int imageId;
     boolean isYourTurning = false;
-    boolean doubleBackToExitPressedOnce = false; // cái này note sai ha
-    int currentPlayer;// luu thang nao duoc danh tiep theo
+    boolean doubleBackToExitPressedOnce = false;
+    int currentPlayer;
     RecyclerView recyclerView;
     TextView tv_your_turn;
     TextView tv_other;
@@ -54,8 +55,10 @@ public class GameActivity extends AppCompatActivity {
         if (intent.getStringArrayExtra("Info") != null) {
             String[] info = intent.getStringArrayExtra("Info");
             roomId = info[0];
-            imageId = Integer.parseInt(info[1]); // ok chưa obkạn
+            imageId = Integer.parseInt(info[1]);
             adminId = info[2];
+
+
             setTitle(roomId);
         }
 
@@ -68,11 +71,12 @@ public class GameActivity extends AppCompatActivity {
         updateUI();
 
         // show chessboard
+
         DatabaseReference myRef = FirebaseSingleton.getInstance().databaseReference.child("game").child(roomId).child("listNode");
         FirebaseRecyclerOptions<Node> options = new FirebaseRecyclerOptions.Builder<Node>()
-                .setQuery(myRef, Node.class)
+                .setQuery(myRef,Node.class)
                 .build();
-        RecyclerNodeAdapter adapter = new RecyclerNodeAdapter(options, this);
+        RecyclerNodeAdapter adapter=new RecyclerNodeAdapter(options,this);
         adapter.startListening();
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new GridLayoutManager(this, Constraints.COLUMN_COUNT_ITEM_IMAGE));
@@ -81,21 +85,33 @@ public class GameActivity extends AppCompatActivity {
         adapter.addItemClickListener(new RecyclerNodeAdapter.ItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                if (isYourTurning) {
+
+                if (isYourTurning && !hasEndGame) {
                     int x = position / Constraints.COLUMN_COUNT_ITEM_IMAGE;
                     int y = position % Constraints.COLUMN_COUNT_ITEM_IMAGE;
+                    if (matrix[x][y] != Constraints.IMAGE_ID_NULL)
+                        Toast.makeText(GameActivity.this, "btn co image id=  "+matrix[x][y], Toast.LENGTH_SHORT).show();
+
                     if (matrix[x][y] == Constraints.IMAGE_ID_NULL) {
-                        FirebaseSingleton.getInstance().insert(roomId, position, imageId);
+                        FirebaseSingleton.getInstance().insertNode(roomId, position, imageId);
                         FirebaseSingleton.getInstance().databaseReference.child("game").child(roomId).child("currentPlayer").setValue(changeCurrent(currentPlayer));
                     }
                 }
+                if (isYourTurning && hasEndGame) {
+                    Toast.makeText(GameActivity.this, "Item click", Toast.LENGTH_SHORT).show();
+                    // lúc newgame xong t đánh thì nó hiện thong báo  này "item click"
+                }
+
 
             }
         });
 
         //getListNode kiểm tra thắng thua
         checkWin(roomId);
-
+        //theo doi trang thai cua game
+        checkStatus(roomId);
+        //kiem tra co ai thoat game giua chung
+        listenPlayerOutGame(roomId);
         // start new game
         btnNewGame.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -109,14 +125,29 @@ public class GameActivity extends AppCompatActivity {
                 }
                 if (hasEndGame && adminId.compareTo(PlayerInfo.playerName) == 0) {
                     restartGame();
+
                 }
 
             }
         });
     }
 
+    private void checkStatus(String roomId) {
+        FirebaseSingleton.getInstance().databaseReference.child("game").child(roomId).child("endGame").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                boolean value = snapshot.getValue(boolean.class);
+                hasEndGame = value;
+            }
 
-    //
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+
     private void checkWin(String roomId) {
         FirebaseSingleton.getInstance().databaseReference.child("game").child(roomId).child("listNode").addChildEventListener(new ChildEventListener() {
             @Override
@@ -127,16 +158,22 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
 
-                int value = snapshot.getValue(Node.class).getImageId();
-                int pos = Integer.parseInt(snapshot.getKey());
-                int x = pos / Constraints.COLUMN_COUNT_ITEM_IMAGE;
-                int y = pos % Constraints.COLUMN_COUNT_ITEM_IMAGE;
-                matrix[x][y] = value;
-                if (isEndGame(matrix, x, y, value)) {
-                    Toast.makeText(GameActivity.this, "Kết thúc game", Toast.LENGTH_SHORT).show();
-                    hasEndGame = true;
-                }
+                int imageIdValue = snapshot.getValue(Node.class).getImageId();
+                if (imageIdValue != Constraints.IMAGE_ID_NULL) {
+                    int pos = Integer.parseInt(snapshot.getKey());
+                    int x = pos / Constraints.COLUMN_COUNT_ITEM_IMAGE;
+                    int y = pos % Constraints.COLUMN_COUNT_ITEM_IMAGE;
+                    matrix[x][y] = imageIdValue;
+                    if (isEndGame(matrix, x, y, imageIdValue)) {
+                        if (imageId == imageIdValue)
+                            Toast.makeText(GameActivity.this, "KẾT THÚC GAME, BẠN ĐÃ CHIẾN THẮNG.", Toast.LENGTH_SHORT).show();
+                        else
+                            Toast.makeText(GameActivity.this, "KẾT THÚC GAME, BẠN ĐÃ THẤT BẠI.", Toast.LENGTH_SHORT).show();
 
+                        FirebaseSingleton.getInstance().databaseReference.child("game").child(roomId).child("endGame").setValue(true);
+
+                    }
+                }
             }
 
             @Override
@@ -156,6 +193,7 @@ public class GameActivity extends AppCompatActivity {
         });
 
     }
+
 
     private boolean isEndGame(int[][] matrix, int x, int y, int imageId) {
         return isEndHorizontal(matrix, x, y, imageId) || isEndVertical(matrix, x, y, imageId) || isEndMain(matrix, x, y, imageId) || isEndSecondary(matrix, x, y, imageId);
@@ -207,7 +245,7 @@ public class GameActivity extends AppCompatActivity {
             }
         }
 
-        return hasWin(count, endPoint); // may nghe t noi k co
+        return hasWin(count, endPoint);
 
     }
 
@@ -221,10 +259,11 @@ public class GameActivity extends AppCompatActivity {
             id = matrix[x - i][y - i];
             if (id == value) {
                 count++;
-            } else if (id != Constraints.IMAGE_ID_NULL)
-                endPoint++;
-            break;
-
+            } else {
+                if (id != Constraints.IMAGE_ID_NULL)
+                    endPoint++;
+                break;
+            }
         }
 
 
@@ -234,76 +273,74 @@ public class GameActivity extends AppCompatActivity {
             id = matrix[x + i][y + i];
             if (id == value) {
                 count++;
-            } else if (id != Constraints.IMAGE_ID_NULL)
-                endPoint++;
-            break;
-
+            } else {
+                if (id != Constraints.IMAGE_ID_NULL)
+                    endPoint++;
+                break;
+            }
         }
         return hasWin(count, endPoint);
-
     }
 
     private boolean isEndVertical(int[][] matrix, int x, int y, int value) {
         int endPoint = 0;
         int count = 0;
         int id;
-        for (int i = x; i >= 0; i--) {
+        for (int i = x; i >= x - 6; i--) {
+            if (!isOnChessBoard(i, y)) break;
             id = matrix[i][y];
             if (id == value) {
                 count++;
-            } else if (id == Constraints.IMAGE_ID_NULL)
-                endPoint++;
-            break;
+            } else {
+                if (id != Constraints.IMAGE_ID_NULL)
+                    endPoint++;
 
+                break;
+            }
         }
         for (int j = x + 1; j <= x + 1 + 6; j++) {
+            if (!isOnChessBoard(j, y)) break;
             id = matrix[j][y];
             if (id == value) {
                 count++;
-            } else if (id == Constraints.IMAGE_ID_NULL)
-
-                endPoint++;
-            break;
-
+            } else {
+                if (id != Constraints.IMAGE_ID_NULL)
+                    endPoint++;
+                break;
+            }
         }
         return hasWin(count, endPoint);
-
-
     }
 
     private boolean isEndHorizontal(int[][] matrix, int x, int y, int value) {
-//duyệt ben trái
         int endPoint = 0;
         int count = 0;
         int id;
-        for (int i = y; i >= 0; i--) {
+        for (int i = y; i >= y - 6; i--) {
+            if (!isOnChessBoard(x, i)) break;
             id = matrix[x][i];
             if (id == value) {
                 count++;
-            } else if (id == Constraints.IMAGE_ID_NULL)
+            } else if (id != Constraints.IMAGE_ID_NULL)
                 endPoint++;
             break;
         }
 
         for (int j = y + 1; j <= y + 1 + 6; j++) {
+            if (!isOnChessBoard(x, j)) break;
             id = matrix[x][j];
             if (id == value) {
                 count++;
-            } else if (id == Constraints.IMAGE_ID_NULL)
-
-                endPoint++;
-            break;
+            } else {
+                if (id != Constraints.IMAGE_ID_NULL)
+                    endPoint++;
+                break;
+            }
 
         }
         return hasWin(count, endPoint);
     }
 
-    private int checkLaw(int x) {
-        int note = 0;
-
-
-        return note;
-    }
 
     private void updateUI() {
         FirebaseSingleton.getInstance().databaseReference.child("game").child(roomId).child("currentPlayer").addValueEventListener(new ValueEventListener() {
@@ -353,34 +390,50 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private int changeCurrent(int currentPlayer) {
-        if (currentPlayer == Constraints.IMAGE_ID_X)
-            return Constraints.IMAGE_ID_O;
-        else
-            return Constraints.IMAGE_ID_X;
+
+        return currentPlayer == Constraints.IMAGE_ID_X ? Constraints.IMAGE_ID_O : Constraints.IMAGE_ID_X;
     }
 
     @Override
     public void onBackPressed() {
         if (doubleBackToExitPressedOnce) {
             removePlayer();
-
             super.onBackPressed();
             finish();
             startMenuRoomActivity();
-
-
             return;
         }
-
         this.doubleBackToExitPressedOnce = true;
         Toast.makeText(this, "If you exit the game, you lose.\n Please click BACK again to exit", Toast.LENGTH_SHORT).show();
-
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 doubleBackToExitPressedOnce = false;
             }
         }, 2000);
+
+    }
+
+    private void listenPlayerOutGame(String roomId) {
+        FirebaseSingleton.getInstance().databaseReference.child("room").child(roomId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Room room = snapshot.getValue(Room.class);
+                if (room.getAdmin().compareTo(PlayerInfo.playerName) == 0 && room.getOther().isEmpty()) {
+
+                    Toast.makeText(GameActivity.this, "Your opponent surrenders, you win.", Toast.LENGTH_SHORT).show();
+                    finish();
+                    startRoomActivity();
+                    return;
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void startMenuRoomActivity() {
@@ -389,17 +442,26 @@ public class GameActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void restartGame() {
-        List<Node> lst = new ArrayList<>();
-        for (int i = 1; i <= Constraints.COUNT_ITEM_IMAGE; i++) {
-            lst.add(new Node(Constraints.IMAGE_ID_NULL)); // mới tạo thì đương nhiên nó rỗng r.
-        }
-        Game game = new Game(roomId, lst, Constraints.IMAGE_ID_O);// set cho thang chu danh truoc luon
-        FirebaseSingleton.getInstance().insert(game);
+    private void startRoomActivity() {
+        Intent intent = new Intent(GameActivity.this, RoomActivity.class);
+        intent.putExtra("RoomId", roomId);
+        startActivity(intent);
     }
 
+    private void restartGame() {
+
+        List<Node> lst = new ArrayList<>();
+        for (int i = 1; i <= Constraints.COUNT_ITEM_IMAGE; i++) {
+            lst.add(new Node(Constraints.IMAGE_ID_NULL));
+        }
+        Game game = new Game(roomId, lst, Constraints.IMAGE_ID_O, false);
+        FirebaseSingleton.getInstance().insert(game);
+
+    }
+
+
     private void removePlayer() {
-        FirebaseSingleton.getInstance().remove(roomId, PlayerInfo.playerName);
+        FirebaseSingleton.getInstance().removePlayer(roomId, PlayerInfo.playerName);
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {

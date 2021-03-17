@@ -10,14 +10,29 @@ import java.util.List;
 public class Room {
     private String id;
     private String name;
-    private List<Player> playerList;
-    private int maxPlayerCount;
+    private String admin;
+    private String other;
     private int status;
+
+    public String getAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(String admin) {
+        this.admin = admin;
+    }
+
+    public String getOther() {
+        return other;
+    }
+
+    public void setOther(String other) {
+        this.other = other;
+    }
 
     public Room() {
 
     }
-
 
     public int getStatus() {
         return status;
@@ -27,9 +42,6 @@ public class Room {
         this.status = status;
     }
 
-    public List<Player> getPlayerList() {
-        return playerList;
-    }
 
     public String getId() {
         return id;
@@ -43,68 +55,48 @@ public class Room {
         this.name = name;
     }
 
-    public int getMaxPlayerCount() {
-        return maxPlayerCount;
-    }
-
-    public void setMaxPlayerCount(int maxPlayerCount) {
-        this.maxPlayerCount = maxPlayerCount;
-    }
-
-    public Room(String name, int maxPlayerCount) {
+    public Room(String name, String admin) {
         this.name = name;
-        this.maxPlayerCount = maxPlayerCount;
         this.id = Utility.generateRandomString();
-        this.playerList = new ArrayList<>();
+        this.admin = admin;
         this.status = Constraints.STATUS_WAITING;
+        this.other = "";
     }
 
-    public void add(Player player) {
-        if (couldAddPlayer()){
-            playerList.add(player);
+    public void add(String playerName) {
+        if (couldAddPlayer()) {
+            this.other = playerName; //  them vo  chac chan la khach nha ban
         }
-        updateStatus(playerList.size());
-    }
-
-    private void updateStatus(int playerCount) {
-        if (playerCount == maxPlayerCount) {
-            status = Constraints.STATUS_READY;
-            return;
-        }
-        status = Constraints.STATUS_WAITING;
+        setStatus(Constraints.STATUS_READY);
     }
 
     public boolean couldAddPlayer() {
-        if (this.getPlayerCount() < maxPlayerCount)
+        if (other.isEmpty()) // ok k ban.string mà cung có isEmpty dung r  bangh e
             return true;
         return false;
     }
 
+    //  xu  li xoa r ne ban.haha vl ban
     public void remove(String playerName) {
-        boolean removePlayerIsAdmin = false;
-        for (Player player : playerList) {
-            if (player.getName().compareTo(playerName) == 0) {
-                if (player.isAdmin())
-                    removePlayerIsAdmin = true;
-                playerList.remove(player);
-                if (removePlayerIsAdmin)
-                    updateAdmin();
-                updateStatus(playerList.size());
-                return;
-            }
-        }
-        // khi 1 thang roi, neu no la chu phong thi dua chu ohong cho thang con lai, con k thi thoi.
+        //lam  remove coi ban
+        // neu thang remove la admin thi ban  lam gi
+        if (this.admin.compareTo(playerName) == 0)// bạn đã xử lí đổi admin set other
+            this.admin = other;
+        this.other = ""; //  hay.
+        this.setStatus(Constraints.STATUS_WAITING);
     }
 
-    private void updateAdmin() {
-        for (Player player : playerList
-        ) {
-            player.setAdmin(true);
-            return;
-        }
+    public boolean couldDestroy(){
+        if(this.admin.isEmpty())
+            return  true;
+        return false;
     }
 
     public int getPlayerCount() {
-        return playerList.size();
+        if (other.isEmpty())
+            return 1;
+        return 2;
     }
+
+    //  xong  room r. gio qua may class khac.
 }

@@ -1,12 +1,21 @@
 package com.example.caroonline.models;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Game {
     String roomId;
     int currentPlayer;
     List<Node> listNode ;
+    boolean isEndGame;
+
+    public boolean isEndGame() {
+        return isEndGame;
+    }
+
+    public void setEndGame(boolean endGame) {
+        this.isEndGame = endGame;
+    }
+
     public int getCurrentPlayer() {
         return currentPlayer;
     }
@@ -33,9 +42,11 @@ public class Game {
         this.listNode = listNode;
     }
 
-    public Game(String roomId, List<Node> nodes,int currentPlayer) {
+    public Game(String roomId, List<Node> nodes,int currentPlayer,boolean isEndGame) {
         this.roomId = roomId;
         this.listNode = nodes;
+        this.isEndGame = isEndGame;
+
 this.currentPlayer=currentPlayer;
     }
 }

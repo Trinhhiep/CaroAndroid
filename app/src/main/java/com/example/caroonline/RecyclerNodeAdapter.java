@@ -25,7 +25,7 @@ public class RecyclerNodeAdapter extends FirebaseRecyclerAdapter<Node, RecyclerN
 
     @Override
     protected void onBindViewHolder(@NonNull NodeViewHolder holder, int position, @NonNull Node model) {
-        if (model.getImageId() == Constraints.IMAGE_ID_NULL) { // test. tututtu
+        if (model.getImageId() == Constraints.IMAGE_ID_NULL) {
             if(holder.iv_node.getBackground() != null)
                 holder.iv_node.setBackground(null);
             return;

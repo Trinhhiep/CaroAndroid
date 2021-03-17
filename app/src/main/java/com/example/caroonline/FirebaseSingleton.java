@@ -24,30 +24,35 @@ public class FirebaseSingleton {
         databaseReference.child("room").child(room.getId()).setValue(room);
     }
 
-    public void remove(String roomId){
+    public void remove(String roomId) {
         databaseReference.child("room").child(roomId).setValue(null);
     }
 
     public void insert(User user) {
         databaseReference.child("user").child(user.getUsername()).setValue(user);
     }
-    public  void insert(Game game){
+
+    public void insert(Game game) {
         databaseReference.child("game").child(game.getRoomId()).setValue(game);
     }
 
-
-    public void insert(String roomId, int position, int imageId){
+    // nay la add node nhi.
+    public void insertNode(String roomId, int position, int imageId) {
         databaseReference.child("game").child(roomId).child("listNode").child(Integer.toString(position)).child("imageId").setValue(imageId); //hihi quen bạn ơi.// dể mình test đã chứ.ok
     }
 
-    public void remove(String roomId, String playerName){
+    public void addPlayer(String roomId, String playerName) {
+        databaseReference.child("room").child(roomId).child("other").setValue(playerName);
+    }
+
+    public void removePlayer(String roomId, String playerName) {
+        // lam coi ban
         databaseReference.child("room").child(roomId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Room room = snapshot.getValue(Room.class);
-                room.remove(playerName);
-
-                if(room.getPlayerCount() == 0)
+                room.remove(playerName); // bạn ghi mớ có r v,.? // thi
+                if (room.couldDestroy())  // ok chua ban
                     remove(roomId);
                 else insert(room);
             }
@@ -58,7 +63,6 @@ public class FirebaseSingleton {
             }
         });
     }
-
 
 
     //tạo 1 instance duy nhất (static) thông qua nested class lớp lồng lớp
@@ -75,9 +79,6 @@ public class FirebaseSingleton {
     public static FirebaseSingleton getInstance() {
         return FirebaseSingletonHelper.Instance;
     }
-
-
-
 
 
 }

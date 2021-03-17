@@ -1,5 +1,6 @@
 package com.example.caroonline;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -23,37 +24,41 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.List;
 
 
-public class RecyclerPlayerAdapter extends FirebaseRecyclerAdapter<Player, RecyclerPlayerAdapter.UserViewHolder> {
+public class RecyclerPlayerAdapter extends RecyclerView.Adapter<RecyclerPlayerAdapter.UserViewHolder> {
 
+    private Context context;
+    private List<Player> players;
 
-    public RecyclerPlayerAdapter(@NonNull FirebaseRecyclerOptions<Player> options) {
-        super(options);
-
+    public RecyclerPlayerAdapter(Context context, List<Player> players) {
+        this.context = context;
+        this.players = players;
     }
 
     @NonNull
     @Override
     public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View v = inflater.inflate(R.layout.item_player, parent, false); // cai l gi day ban. bạn vẫn mơ hồ quá ta. kkk.
-
+        View v = inflater.inflate(R.layout.item_player, parent, false);
         return new UserViewHolder(v);
     }
 
-
     @Override
-    protected void onBindViewHolder(@NonNull UserViewHolder holder, int position, @NonNull Player model) { // postion kìa bạn
-        // set name
-        holder.setUserName(model.getName());
-        // show admin
-        if (model.isAdmin())
-            holder.setVisibility(true, model);
-        else holder.setVisibility(false, model);
-        // chinh chu thi mau xanh
-        if (model.getName().compareTo(PlayerInfo.playerName) == 0)
-            holder.setColor(Constraints.PLAYER_COLOR);
+    public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
+        Player player  = players.get(position);
+        holder.setUserName(player.getName());
+
+        int color  = Constraints.COLOR_BLACK;
+        if(player.getName().compareTo(PlayerInfo.playerName) == 0)
+            color  = Constraints.PLAYER_COLOR;
+        holder.setColor(color);
+
+        holder.setVisibility(player.isAdmin());
     }
 
+    @Override
+    public int getItemCount() {
+        return players.size();
+    }
 
     public class UserViewHolder extends RecyclerView.ViewHolder {
         TextView userName;
@@ -68,7 +73,7 @@ public class RecyclerPlayerAdapter extends FirebaseRecyclerAdapter<Player, Recyc
             this.userName.setTextColor(playerColor);
         }
 
-        public void setVisibility(boolean isAdmin, Player p) {
+        public void setVisibility(boolean isAdmin) {
             if (isAdmin) {
                 this.imageView.setVisibility(View.VISIBLE);
 
@@ -77,7 +82,6 @@ public class RecyclerPlayerAdapter extends FirebaseRecyclerAdapter<Player, Recyc
 
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);
-
 
             userName = itemView.findViewById(R.id.tv_userName);
             imageView = itemView.findViewById(R.id.im_ic_home);
@@ -88,9 +92,9 @@ public class RecyclerPlayerAdapter extends FirebaseRecyclerAdapter<Player, Recyc
                 }
             });
         }
-
-
     }
+
+    // xong adapter.  tu list  player hien  bt thoi.
 
 
 }

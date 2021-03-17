@@ -52,17 +52,15 @@ public class MenuRoomActivity extends AppCompatActivity {
         adapter.startListening();
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
         adapter.addItemClickListener(new RecyclerRoomAdapter.ItemClickListener() {
             @Override
             public void onItemClick(Room room) {
                 if (room.couldAddPlayer()) {
-                    Player player = new Player(PlayerInfo.playerName, false);
-                    room.add(player);
-                    FirebaseSingleton.getInstance().insert(room);
+                    FirebaseSingleton.getInstance().addPlayer(room.getId(), PlayerInfo.playerName); // add thang khach nha ban.
                     startRoomActivity(room.getId());
                 } else
                     Toast.makeText(MenuRoomActivity.this, "Room is full", Toast.LENGTH_SHORT).show();
-
             }
         });
 
@@ -76,9 +74,7 @@ public class MenuRoomActivity extends AppCompatActivity {
                 userInfoDialog.addCreateRoomListener(new CreateRoomListener() {
                     @Override
                     public void onCreateRoom(String roomName) {
-                        Room room = new Room(roomName, 2);
-                        Player player = new Player(PlayerInfo.playerName, true);
-                        room.add(player);
+                        Room room = new Room(roomName, PlayerInfo.playerName);
                         FirebaseSingleton.getInstance().insert(room);
 
                         userInfoDialog.dismiss();
@@ -90,20 +86,12 @@ public class MenuRoomActivity extends AppCompatActivity {
         });
     }
 
+    //  gi day mi. mi hoc dau  à.
+//cai nao   ham nay ne.cái này hình nhu là luu trạng thái đó bạn
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState, @NonNull PersistableBundle outPersistentState) {
         super.onSaveInstanceState(outState, outPersistentState);
-        outState.putString("PlayerInfo",PlayerInfo.playerName);
-    }
-
-    private Player getAdmin(Room room) {
-        Player admin = null;
-        List<Player> list = room.getPlayerList();
-        for (Player p : list) {
-            if (p.isAdmin())
-                admin = p;
-        }
-        return admin;
+        outState.putString("PlayerInfo",PlayerInfo.playerName);// cái này mình nhớ là bạn viết mà. lam gi co.
     }
 
     private void startRoomActivity(String roomId) {
@@ -115,5 +103,7 @@ public class MenuRoomActivity extends AppCompatActivity {
     public void onBackPressed() {
 
     }
+
+    //  xong menu room activity nha ban.
 
 }
