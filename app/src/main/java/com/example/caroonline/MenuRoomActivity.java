@@ -11,12 +11,15 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.PersistableBundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.caroonline.models.Player;
 import com.example.caroonline.models.Room;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 
 import java.util.List;
@@ -24,7 +27,8 @@ import java.util.List;
 public class MenuRoomActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     FloatingActionButton flab;
-    String playerName;
+    Button btnLogOut;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,17 +37,12 @@ public class MenuRoomActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        if(savedInstanceState!=null){
-         playerName = savedInstanceState.getString("PlayerInfo");
-            String title = String.format("Hello %s", playerName);
-        }
-
         String title = String.format("Hello %s", PlayerInfo.playerName);
         setTitle(title);
 
         recyclerView = findViewById(R.id.rv_room);
         flab = findViewById(R.id.flab);
-
+        btnLogOut = findViewById(R.id.btn_logout);
         DatabaseReference myRef = FirebaseSingleton.getInstance().databaseReference.child("room");
         FirebaseRecyclerOptions<Room> options = new FirebaseRecyclerOptions.Builder<Room>()
                 .setQuery(myRef, Room.class)
@@ -63,7 +62,13 @@ public class MenuRoomActivity extends AppCompatActivity {
                     Toast.makeText(MenuRoomActivity.this, "Room is full", Toast.LENGTH_SHORT).show();
             }
         });
-
+        btnLogOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuth.getInstance().signOut();
+                startActivity(new Intent(MenuRoomActivity.this, MainActivity.class));
+            }
+        });
         flab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -91,7 +96,7 @@ public class MenuRoomActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState, @NonNull PersistableBundle outPersistentState) {
         super.onSaveInstanceState(outState, outPersistentState);
-        outState.putString("PlayerInfo",PlayerInfo.playerName);// cái này mình nhớ là bạn viết mà. lam gi co.
+        outState.putString("PlayerInfo", PlayerInfo.playerName);// cái này mình nhớ là bạn viết mà. lam gi co.
     }
 
     private void startRoomActivity(String roomId) {
@@ -100,6 +105,7 @@ public class MenuRoomActivity extends AppCompatActivity {
 
         startActivity(intent);
     }
+
     public void onBackPressed() {
 
     }

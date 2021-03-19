@@ -5,16 +5,16 @@ import java.util.List;
 public class Game {
     String roomId;
     int currentPlayer;
-    List<Node> listNode ;
-    boolean isEndGame;
+    int status;
 
-    public boolean isEndGame() {
-        return isEndGame;
+    public int getStatus() {
+        return status;
     }
 
-    public void setEndGame(boolean endGame) {
-        this.isEndGame = endGame;
+    public void setStatus(int status) {
+        this.status = status;
     }
+
 
     public int getCurrentPlayer() {
         return currentPlayer;
@@ -34,18 +34,9 @@ public class Game {
         this.roomId = roomId;
     }
 
-    public List<Node> getListNode() {
-        return listNode;
-    }
-
-    public void setListNode(List<Node> listNode) {
-        this.listNode = listNode;
-    }
-
-    public Game(String roomId, List<Node> nodes,int currentPlayer,boolean isEndGame) {
+    public Game(String roomId,int currentPlayer,int status) {
         this.roomId = roomId;
-        this.listNode = nodes;
-        this.isEndGame = isEndGame;
+        this.status = status;
 
 this.currentPlayer=currentPlayer;
     }

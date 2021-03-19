@@ -70,21 +70,21 @@ public class RoomActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Room room = snapshot.getValue(Room.class);
-// có phải khi 1 thang nào đo..1......... chờ mình xíu.
-                updatePlayerList(room.getAdmin(), room.getOther());
-                adminId = room.getAdmin();
-                actionDependsOnStatus(room.getStatus());
-                if (room.getAdmin().compareTo(PlayerInfo.playerName) == 0) {
-                    btnPlay.setVisibility(View.VISIBLE);
+                if (room != null) {
+                    updatePlayerList(room.getAdmin(), room.getOther());
+                    adminId = room.getAdmin();
+                    actionDependsOnStatus(room.getStatus());
+                    if (room.getAdmin().compareTo(PlayerInfo.playerName) == 0) {
+                        btnPlay.setVisibility(View.VISIBLE);
 
-                } else btnPlay.setVisibility(View.INVISIBLE);
+                    } else btnPlay.setVisibility(View.INVISIBLE);
 
-                // kiem tra co the play  dc  k  de cho enable ne.
-                if (!room.couldAddPlayer())
-                    btnPlay.setEnabled(true);
-                else btnPlay.setEnabled(false);
+                    // kiem tra co the play  dc  k  de cho enable ne.
+                    if (!room.couldAddPlayer())
+                        btnPlay.setEnabled(true);
+                    else btnPlay.setEnabled(false);
+                }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
@@ -104,6 +104,16 @@ public class RoomActivity extends AppCompatActivity {
         });
 
     }
+//
+//    @Override
+//    protected void onDestroy() {
+//        removePlayer();
+//        super.onDestroy();
+//        Toast.makeText(this, "On destroy", Toast.LENGTH_SHORT).show();
+//
+//        return;
+//
+//    }
 
     private void updatePlayerList(String admin, String other) {//ok chua ban
         if (playerList.isEmpty()) {
@@ -129,11 +139,7 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     private void createGame(String roomId) {
-        List<Node> lst = new ArrayList<>();
-        for (int i = 1; i <= Constraints.COUNT_ITEM_IMAGE; i++) {
-            lst.add(new Node(Constraints.IMAGE_ID_NULL)); // mới tạo thì đương nhiên nó rỗng r.
-        }
-        Game game = new Game(roomId, lst, Constraints.IMAGE_ID_O,false);// set cho thang chu danh truoc luon
+        Game game = new Game(roomId, Constraints.IMAGE_ID_O,Constraints.GAME_STATUS_PLAYING);
         FirebaseSingleton.getInstance().insert(game);
     }
 
@@ -154,13 +160,19 @@ public class RoomActivity extends AppCompatActivity {
         intent.putExtra("Info", info);//bo cai nay
         startActivity(intent);
     }
+    private void startMenuRoomActivity() {
+        Intent intent = new Intent(RoomActivity.this, MenuRoomActivity.class);
+        intent.putExtra("RoomId", roomId);
+        startActivity(intent);
+    }
 
 
     @Override
     public void onBackPressed() {
         if (doubleBackToExitPressedOnce) {
-            removePlayer();
+           removePlayer();
             super.onBackPressed();
+            startMenuRoomActivity();
             return;
         }
 

@@ -1,7 +1,10 @@
 package com.example.caroonline.models;
 
+import android.widget.Toast;
+
 import com.example.caroonline.Constraints;
 import com.example.caroonline.FirebaseSingleton;
+import com.example.caroonline.RoomActivity;
 import com.example.caroonline.Utility;
 
 import java.util.ArrayList;
@@ -78,17 +81,18 @@ public class Room {
 
     //  xu  li xoa r ne ban.haha vl ban
     public void remove(String playerName) {
-        //lam  remove coi ban
-        // neu thang remove la admin thi ban  lam gi
-        if (this.admin.compareTo(playerName) == 0)// bạn đã xử lí đổi admin set other
-            this.admin = other;
-        this.other = ""; //  hay.
+        if (this.getAdmin().compareTo(playerName) == 0) {
+            this.setAdmin(other);
+        }
+
+        this.setOther("");
         this.setStatus(Constraints.STATUS_WAITING);
+
     }
 
-    public boolean couldDestroy(){
-        if(this.admin.isEmpty())
-            return  true;
+    public boolean couldDestroy() {
+        if (this.admin.isEmpty())
+            return true;
         return false;
     }
 

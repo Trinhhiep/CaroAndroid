@@ -3,7 +3,7 @@ package com.example.caroonline;
 import androidx.annotation.NonNull;
 
 import com.example.caroonline.models.Game;
-import com.example.caroonline.models.Player;
+import com.example.caroonline.models.Node;
 import com.example.caroonline.models.Room;
 import com.example.caroonline.models.User;
 import com.google.firebase.database.DataSnapshot;
@@ -24,8 +24,10 @@ public class FirebaseSingleton {
         databaseReference.child("room").child(room.getId()).setValue(room);
     }
 
-    public void remove(String roomId) {
+    public void removeRoomAndGame(String roomId) {
         databaseReference.child("room").child(roomId).setValue(null);
+        databaseReference.child("game").child(roomId).setValue(null);
+
     }
 
     public void insert(User user) {
@@ -36,9 +38,20 @@ public class FirebaseSingleton {
         databaseReference.child("game").child(game.getRoomId()).setValue(game);
     }
 
-    // nay la add node nhi.
-    public void insertNode(String roomId, int position, int imageId) {
-        databaseReference.child("game").child(roomId).child("listNode").child(Integer.toString(position)).child("imageId").setValue(imageId); //hihi quen bạn ơi.// dể mình test đã chứ.ok
+    // ban bi gi v. restart game ne.
+    public void restartGame(String roomId){
+        // lay duong dan game ra nha ban. ban dau r ban lol......ok
+        DatabaseReference game = databaseReference.child("game").child(roomId);
+        // clear node
+        game.child("listNode").setValue(null); // ne
+        // set status, ban mo ta trang thai nay coi.// theo ten đó , chưa xong gaem , da xong game , newgame là luc thang chu bam nút tao game moi not ended
+        game.child("status").setValue(Constraints.GAME_STATUS_NEWGAME);
+        // current khoi set. dang luot thang nao de nguyen luôn cho nó công bằng.o7
+    }
+
+    // nay la add node nhi. run lau ha
+    public void insertNode(String roomId, int position, Node node) {
+        databaseReference.child("game").child(roomId).child("listNode").child(Integer.toString(position)).setValue(node); //hihi quen bạn ơi.// dể mình test đã chứ.ok
     }
 
     public void addPlayer(String roomId, String playerName) {
@@ -46,14 +59,16 @@ public class FirebaseSingleton {
     }
 
     public void removePlayer(String roomId, String playerName) {
-        // lam coi ban
+
         databaseReference.child("room").child(roomId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Room room = snapshot.getValue(Room.class);
-                room.remove(playerName); // bạn ghi mớ có r v,.? // thi
-                if (room.couldDestroy())  // ok chua ban
-                    remove(roomId);
+                room.remove(playerName);
+                if (room.couldDestroy())
+                {removeRoomAndGame(roomId);
+                return;
+                }
                 else insert(room);
             }
 

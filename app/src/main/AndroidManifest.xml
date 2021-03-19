@@ -16,8 +16,8 @@
         <activity android:name=".TestActivity">
 
         </activity>
-        <activity android:name=".GameActivity" />
-        <activity android:name=".RoomActivity" />
+        <activity android:name=".GameActivity"  android:noHistory="true" />
+        <activity android:name=".RoomActivity" android:noHistory="true" />
         <activity android:name=".MenuRoomActivity" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".MainActivity">

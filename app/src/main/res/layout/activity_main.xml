@@ -11,7 +11,7 @@
         android:layout_width="300dp"
         android:layout_height="50dp"
         android:hint="Username"
-        android:text="Hie"
+        android:text=""
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.495"
@@ -25,7 +25,7 @@
         android:layout_height="50dp"
         android:layout_marginTop="20dp"
         android:hint="Password"
-        android:text="1231"
+        android:text="1"
         android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -51,5 +51,15 @@
         app:layout_constraintEnd_toStartOf="@+id/btn_login"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/et_password" />
+
+    <Button
+        android:id="@+id/btn_google_login"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="login with google account"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/et_password"></Button>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
