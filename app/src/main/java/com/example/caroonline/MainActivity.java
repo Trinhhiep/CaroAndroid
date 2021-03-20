@@ -104,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
                 signIn();
             }
         });
+
         btn_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -147,11 +148,8 @@ public class MainActivity extends AppCompatActivity {
                 // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 firebaseAuthWithGoogle(account.getIdToken()); // khi ban dang nhap thanh cong thi nó sẽ luuw lại phiên đăng nhập này.
-                Intent intent =new Intent(getApplicationContext(),MenuRoomActivity.class);
 
-                account.getDisplayName(); // bạn lấy cái này làm name nha.ua,
 
-                startActivity(intent);
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
                 Toast.makeText(MainActivity.this, "alo", Toast.LENGTH_SHORT).show();
@@ -171,7 +169,11 @@ public class MainActivity extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser();
-                            Toast.makeText(MainActivity.this, "loa", Toast.LENGTH_SHORT).show(); // oke la r ne,. nho dung may cai signin ( ke cả của fb) thì nhớ thêm sha1 key nha.
+                            PlayerInfo.playerName = user.getDisplayName();
+
+                            Toast.makeText(MainActivity.this, "success", Toast.LENGTH_SHORT).show(); // oke la r ne,. nho dung may cai signin ( ke cả của fb) thì nhớ thêm sha1 key nha.
+                            Intent intent =new Intent(getApplicationContext(),MenuRoomActivity.class);
+                            startActivity(intent);
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
